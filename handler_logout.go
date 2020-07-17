@@ -1,20 +1,22 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func Logout(c *gin.Context) {
-	au, err := ExtractTokenMetadata(c.Request)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, "unauthorized")
-		return
-	}
-	deleted, delErr := RedisDeleteAuth(au.AccessUuid)
-	if delErr != nil || deleted == 0 { //if any goes wrong
-		c.JSON(http.StatusUnauthorized, "unauthorized")
-		return
-	}
-	c.JSON(http.StatusOK, "Successfully logged out")
+func Logout() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		au, err := ExtractTokenMetadata(r)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		deleted, delErr := RedisDeleteAuth(au.AccessUuid)
+		if delErr != nil || deleted == 0 { //if any goes wrong
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	})
 }

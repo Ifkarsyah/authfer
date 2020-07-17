@@ -1,22 +1,20 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/gorilla/mux"
 	"log"
+	"net/http"
 )
 
 var (
-	router = gin.Default()
+	r = mux.NewRouter()
 )
 
 func main() {
-	router.POST("/login", Login)
-	router.POST("/token/refresh", Refresh)
+	r.Methods(http.MethodPost).Path("/login").HandlerFunc(Login)
+	r.Methods(http.MethodPost).Path("/refresh").HandlerFunc(Refresh)
 
-	authorized := router.Group("/", TokenAuthMiddleware())
-	{
-		authorized.POST("/logout", Logout)
-	}
+	r.Methods(http.MethodPost).Path("/logout").Handler(TokenAuthMiddleware(Logout()))
 
-	log.Fatal(router.Run(":8090"))
+	log.Fatal(http.ListenAndServe(":8090", r))
 }

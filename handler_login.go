@@ -1,33 +1,46 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"encoding/json"
 	"net/http"
 )
 
-func Login(c *gin.Context) {
+func Login(w http.ResponseWriter, r *http.Request) {
 	var u User
-	if err := c.ShouldBindJSON(&u); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
+
+	err := json.NewDecoder(r.Body).Decode(&u)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Invalid json provided")
 		return
 	}
+
 	//compare the user from the request, with the one we defined:
 	if user.Username != u.Username || user.Password != u.Password {
-		c.JSON(http.StatusUnauthorized, "Please provide valid login details")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Please provide valid login details")
 		return
 	}
+
 	ts, err := CreateToken(user.ID)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Internal Error")
 		return
 	}
-	saveErr := RedisCreateAuth(user.ID, ts)
-	if saveErr != nil {
-		c.JSON(http.StatusUnprocessableEntity, saveErr.Error())
+
+	err = RedisCreateAuth(user.ID, ts)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Internal Error")
+		return
 	}
+
 	tokens := map[string]string{
 		"access_token":  ts.AccessToken,
 		"refresh_token": ts.RefreshToken,
 	}
-	c.JSON(http.StatusOK, tokens)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tokens)
 }
