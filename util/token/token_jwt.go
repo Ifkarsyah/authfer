@@ -1,23 +1,15 @@
-package main
+package token
 
 import (
 	"fmt"
+	"github.com/Ifkarsyah/authfer/model"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/twinj/uuid"
 	"time"
 )
 
-type TokenDetails struct {
-	AccessToken  string
-	RefreshToken string
-	AccessUuid   string
-	RefreshUuid  string
-	AtExpires    int64
-	RtExpires    int64
-}
-
-func CreateToken(userid uint64) (*TokenDetails, error) {
-	td := &TokenDetails{
+func CreateToken(userid uint64) (*model.TokenDetails, error) {
+	td := &model.TokenDetails{
 		AtExpires:   time.Now().Add(time.Minute * 15).Unix(),
 		AccessUuid:  uuid.NewV4().String(),
 		RtExpires:   time.Now().Add(time.Hour * 24 * 7).Unix(),
@@ -37,7 +29,7 @@ func CreateToken(userid uint64) (*TokenDetails, error) {
 	return td, nil
 }
 
-func createRefreshToken(userid uint64, td *TokenDetails) (string, error) {
+func createRefreshToken(userid uint64, td *model.TokenDetails) (string, error) {
 	rtClaims := jwt.MapClaims{}
 	rtClaims["refresh_uuid"] = td.RefreshUuid
 	rtClaims["user_id"] = userid
@@ -46,7 +38,7 @@ func createRefreshToken(userid uint64, td *TokenDetails) (string, error) {
 	return rt.SignedString([]byte("REFRESH_SECRET"))
 }
 
-func createAccessToken(userid uint64, td *TokenDetails) (string, error) {
+func createAccessToken(userid uint64, td *model.TokenDetails) (string, error) {
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
 	atClaims["access_uuid"] = td.AccessUuid
@@ -56,7 +48,7 @@ func createAccessToken(userid uint64, td *TokenDetails) (string, error) {
 	return at.SignedString([]byte("ACCESS_SECRET"))
 }
 
-func checkConformHMAC(secret string) func(token *jwt.Token) (interface{}, error) {
+func CheckConformHMAC(secret string) func(token *jwt.Token) (interface{}, error) {
 	return func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])

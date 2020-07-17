@@ -1,7 +1,10 @@
-package main
+package api
 
 import (
 	"fmt"
+	"github.com/Ifkarsyah/authfer/repo"
+	"github.com/Ifkarsyah/authfer/util/responder"
+	token2 "github.com/Ifkarsyah/authfer/util/token"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"strconv"
@@ -12,21 +15,21 @@ func Logout() http.Handler {
 
 		au, err := ExtractTokenMetadata(r)
 		if err != nil {
-			ResponseError(w, err)
+			responder.ResponseError(w, err)
 			return
 		}
 
-		deleted, delErr := RedisDeleteAuth(au.AccessUuid)
+		deleted, delErr := repo.RedisDeleteAuth(au.AccessUuid)
 		if delErr != nil || deleted == 0 { //if any goes wrong
-			ResponseError(w, err)
+			responder.ResponseError(w, err)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
 	})
 }
 
-func ExtractTokenMetadata(r *http.Request) (*AccessDetails, error) {
-	token, err := VerifyToken(r)
+func ExtractTokenMetadata(r *http.Request) (*repo.AccessDetails, error) {
+	token, err := token2.VerifyToken(r)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +46,7 @@ func ExtractTokenMetadata(r *http.Request) (*AccessDetails, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &AccessDetails{
+	return &repo.AccessDetails{
 		AccessUuid: accessUuid,
 		UserId:     userId,
 	}, nil

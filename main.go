@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/Ifkarsyah/authfer/api"
+	"github.com/Ifkarsyah/authfer/handler"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -11,9 +13,9 @@ var (
 )
 
 func main() {
-	r.Methods(http.MethodPost).Path("/login").Handler(LoginAPI(LoginHandler))
-	r.Methods(http.MethodPost).Path("/refresh").Handler(RefreshAPI())
-	r.Methods(http.MethodPost).Path("/logout").Handler(MiddlewareAuth(Logout()))
+	r.Methods(http.MethodPost).Path("/login").Handler(api.LoginAPI(handler.LoginHandler))
+	r.Methods(http.MethodPost).Path("/refresh").Handler(api.RefreshAPI())
+	r.Methods(http.MethodPost).Path("/logout").Handler(api.MiddlewareAuth(api.Logout()))
 
 	log.Fatal(http.ListenAndServe(":8090", r))
 }

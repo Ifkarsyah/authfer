@@ -1,8 +1,9 @@
-package main
+package responder
 
 import (
 	"encoding/json"
 	"errors"
+	"github.com/Ifkarsyah/authfer/util/errs"
 	"net/http"
 )
 
@@ -35,9 +36,9 @@ func errToHttpFormat(err error) (int, interface{}) {
 	resp := CommonResponse{Status: 1, Description: err.Error()}
 
 	switch {
-	case checkErrorType(err, ErrAuth):
+	case checkErrorType(err, errs.ErrAuth):
 		return http.StatusUnauthorized, resp
-	case checkErrorType(err, ErrBadRequest):
+	case checkErrorType(err, errs.ErrBadRequest):
 		return http.StatusUnauthorized, resp
 	default:
 		resp.Description = "err internal"

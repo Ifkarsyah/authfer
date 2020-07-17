@@ -1,4 +1,4 @@
-package main
+package token
 
 import (
 	"github.com/dgrijalva/jwt-go"
@@ -17,6 +17,15 @@ func IsTokenValid(r *http.Request) error {
 	return nil
 }
 
+func VerifyToken(r *http.Request) (*jwt.Token, error) {
+	tokenString := ExtractToken(r)
+	token, err := jwt.Parse(tokenString, CheckConformHMAC("ACCESS_SECRET"))
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
+}
+
 func ExtractToken(r *http.Request) string {
 	bearToken := r.Header.Get("Authorization")
 	strArr := strings.Split(bearToken, " ")
@@ -24,13 +33,4 @@ func ExtractToken(r *http.Request) string {
 		return strArr[1]
 	}
 	return ""
-}
-
-func VerifyToken(r *http.Request) (*jwt.Token, error) {
-	tokenString := ExtractToken(r)
-	token, err := jwt.Parse(tokenString, checkConformHMAC("ACCESS_SECRET"))
-	if err != nil {
-		return nil, err
-	}
-	return token, nil
 }

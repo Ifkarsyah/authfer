@@ -1,6 +1,7 @@
-package main
+package repo
 
 import (
+	"github.com/Ifkarsyah/authfer/model"
 	"github.com/go-redis/redis/v7"
 	"strconv"
 	"time"
@@ -28,7 +29,7 @@ type AccessDetails struct {
 	UserId     uint64
 }
 
-func RedisCreateAuth(userid uint64, td *TokenDetails) error {
+func RedisCreateAuth(userid uint64, td *model.TokenDetails) error {
 	at := time.Unix(td.AtExpires, 0) //converting Unix to UTC(to Time object)
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
