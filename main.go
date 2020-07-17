@@ -11,10 +11,9 @@ var (
 )
 
 func main() {
-	r.Methods(http.MethodPost).Path("/login").HandlerFunc(Login)
-	r.Methods(http.MethodPost).Path("/refresh").HandlerFunc(Refresh)
-
-	r.Methods(http.MethodPost).Path("/logout").Handler(TokenAuthMiddleware(Logout()))
+	r.Methods(http.MethodPost).Path("/login").Handler(LoginAPI(LoginHandler))
+	r.Methods(http.MethodPost).Path("/refresh").Handler(RefreshAPI())
+	r.Methods(http.MethodPost).Path("/logout").Handler(MiddlewareAuth(Logout()))
 
 	log.Fatal(http.ListenAndServe(":8090", r))
 }
