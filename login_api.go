@@ -5,21 +5,21 @@ import (
 	"net/http"
 )
 
-type loginHandlerFunc func(u *User) (*TokenDetails, error)
+type loginHandlerFunc func(*LoginParams) (*LoginOutput, error)
 
 func LoginAPI(loginHandler loginHandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		u := new(User)
 
-		err := json.NewDecoder(r.Body).Decode(u)
+		params := new(LoginParams)
+		err := json.NewDecoder(r.Body).Decode(params)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+			ResponseError(w, ErrBadRequest)
 			return
 		}
 
-		ts, err := loginHandler(u)
+		ts, err := loginHandler(params)
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
+			ResponseError(w, err)
 			return
 		}
 

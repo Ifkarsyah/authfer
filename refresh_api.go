@@ -14,8 +14,7 @@ func RefreshAPI() http.Handler {
 
 		err := json.NewDecoder(r.Body).Decode(&mapToken)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode("Invalid json provided")
+			ResponseError(w, ErrBadRequest)
 			return
 		}
 		refreshToken := mapToken["refresh_token"]

@@ -12,13 +12,13 @@ func Logout() http.Handler {
 
 		au, err := ExtractTokenMetadata(r)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			ResponseError(w, err)
 			return
 		}
 
 		deleted, delErr := RedisDeleteAuth(au.AccessUuid)
 		if delErr != nil || deleted == 0 { //if any goes wrong
-			w.WriteHeader(http.StatusInternalServerError)
+			ResponseError(w, err)
 			return
 		}
 		w.WriteHeader(http.StatusOK)

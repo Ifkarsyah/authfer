@@ -1,22 +1,36 @@
 package main
 
-import "errors"
+type LoginParams struct {
+	Username string
+	Password string
+}
 
-func LoginHandler(u *User) (*TokenDetails, error) {
-	anyError := errors.New("any")
-	if user.Username != u.Username || user.Password != u.Password {
-		return nil, anyError
-	}
+type LoginOutput struct {
+	Ts *TokenDetails
+}
 
-	ts, err := CreateToken(user.ID)
+func LoginHandler(u *LoginParams) (*LoginOutput, error) {
+	userid, err := UserRepoSearchWithUsernamePassword(u.Username, u.Password)
 	if err != nil {
-		return nil, anyError
+		return nil, ErrAuth
 	}
 
-	err = RedisCreateAuth(user.ID, ts)
+	ts, err := CreateToken(userid)
 	if err != nil {
-		return nil, anyError
+		return nil, err
 	}
 
-	return ts, nil
+	err = RedisCreateAuth(userid, ts)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LoginOutput{Ts: ts}, nil
+}
+
+func UserRepoSearchWithUsernamePassword(username string, password string) (userid uint64, err error) {
+	if user.Username != username || user.Password != password {
+		return 0, err
+	}
+	return 1, nil
 }
