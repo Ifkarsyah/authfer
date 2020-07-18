@@ -1,9 +1,9 @@
 package api
 
 import (
-	"github.com/Ifkarsyah/authfer/util/errs"
-	"github.com/Ifkarsyah/authfer/util/responder"
-	"github.com/Ifkarsyah/authfer/util/token"
+	"github.com/Ifkarsyah/authfer/pkg/errs"
+	"github.com/Ifkarsyah/authfer/pkg/responder"
+	"github.com/Ifkarsyah/authfer/pkg/token"
 	"net/http"
 )
 

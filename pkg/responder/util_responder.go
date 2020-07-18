@@ -3,7 +3,7 @@ package responder
 import (
 	"encoding/json"
 	"errors"
-	"github.com/Ifkarsyah/authfer/util/errs"
+	"github.com/Ifkarsyah/authfer/pkg/errs"
 	"net/http"
 )
 

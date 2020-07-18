@@ -2,9 +2,9 @@ package api
 
 import (
 	"fmt"
+	"github.com/Ifkarsyah/authfer/pkg/responder"
+	token2 "github.com/Ifkarsyah/authfer/pkg/token"
 	"github.com/Ifkarsyah/authfer/repo"
-	"github.com/Ifkarsyah/authfer/util/responder"
-	token2 "github.com/Ifkarsyah/authfer/util/token"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"strconv"

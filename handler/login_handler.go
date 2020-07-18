@@ -2,9 +2,9 @@ package handler
 
 import (
 	"github.com/Ifkarsyah/authfer/model"
+	"github.com/Ifkarsyah/authfer/pkg/errs"
+	"github.com/Ifkarsyah/authfer/pkg/token"
 	"github.com/Ifkarsyah/authfer/repo"
-	"github.com/Ifkarsyah/authfer/util/errs"
-	"github.com/Ifkarsyah/authfer/util/token"
 )
 
 type LoginParams struct {

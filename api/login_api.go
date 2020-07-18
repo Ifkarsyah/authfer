@@ -3,8 +3,8 @@ package api
 import (
 	"encoding/json"
 	"github.com/Ifkarsyah/authfer/handler"
-	"github.com/Ifkarsyah/authfer/util/errs"
-	"github.com/Ifkarsyah/authfer/util/responder"
+	"github.com/Ifkarsyah/authfer/pkg/errs"
+	"github.com/Ifkarsyah/authfer/pkg/responder"
 	"net/http"
 )
 
