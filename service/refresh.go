@@ -41,7 +41,7 @@ func (h *Service) RefreshToken(u *RefreshTokenParams) (*LoginOutput, error) {
 	}
 
 	//Delete the previous Refresh Token
-	deleted, err := h.Cacher.RedisDeleteAuth(refreshUuid)
+	deleted, err := h.Redis.RedisDeleteAuth(refreshUuid)
 	if err != nil || deleted == 0 { //if any goes wrong
 		return nil, errs.ErrAuth
 	}
@@ -53,7 +53,7 @@ func (h *Service) RefreshToken(u *RefreshTokenParams) (*LoginOutput, error) {
 	}
 
 	//save the tokens metadata to redis
-	err = h.Cacher.RedisCreateAuth(userId, ts)
+	err = h.Redis.RedisCreateAuth(userId, ts)
 	if err != nil {
 		return nil, err
 	}

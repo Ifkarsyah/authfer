@@ -25,7 +25,7 @@ func (h *Service) Login(u *LoginParams) (*LoginOutput, error) {
 		return nil, err
 	}
 
-	err = h.Cacher.RedisCreateAuth(userid, ts)
+	err = h.Redis.RedisCreateAuth(userid, ts)
 	if err != nil {
 		return nil, err
 	}

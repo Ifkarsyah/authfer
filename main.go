@@ -12,19 +12,19 @@ import (
 	"time"
 )
 
-func NewRouter(handler service.Service) *mux.Router {
+func NewRouter(svc service.Service) *mux.Router {
 	root := mux.NewRouter()
 
-	root.Methods(http.MethodPost).Path("/login").Handler(api.LoginAPI(handler.Login))
-	//root.Methods(http.MethodPost).Path("/refresh").Service(api.RefreshAPI())
-	root.Methods(http.MethodPost).Path("/logout").Handler(api.MiddlewareAuth(api.Logout(handler.Logout)))
+	root.Methods(http.MethodPost).Path("/login").Handler(api.LoginAPI(svc.Login))
+	root.Methods(http.MethodPost).Path("/refresh").Handler(api.RefreshAPI(svc.RefreshToken))
+	root.Methods(http.MethodPost).Path("/logout").Handler(api.MiddlewareAuth(api.Logout(svc.Logout)))
 
 	return root
 }
 
-func NewHandler(dep *Dependency) service.Service {
+func NewService(dep *Dependency) service.Service {
 	return service.Service{
-		Cacher: dep.cache,
+		Redis: dep.cache,
 	}
 }
 
@@ -33,18 +33,16 @@ type Dependency struct {
 }
 
 func main() {
-	c := config.InitAppConfig()
-
-	h := NewHandler(&Dependency{
-		cache: repo.NewRedisConnection(c.RedisHost, c.RedisPort),
+	svc := NewService(&Dependency{
+		cache: repo.NewRedisConnection(config.AppConfig.RedisHost, config.AppConfig.RedisPort),
 	})
 
-	srv := &http.Server{
-		Handler:      NewRouter(h),
-		Addr:         fmt.Sprintf("%s:%s", c.Host, c.Port),
+	server := &http.Server{
+		Handler:      NewRouter(svc),
+		Addr:         fmt.Sprintf("%s:%s", config.AppConfig.Host, config.AppConfig.Port),
 		ReadTimeout:  60 * time.Second,
 		WriteTimeout: 60 * time.Second,
 	}
 
-	log.Fatal(srv.ListenAndServe())
+	log.Fatal(server.ListenAndServe())
 }

@@ -52,6 +52,12 @@ func parseConfigFilePath() string {
 	return filepath.Join(workPath, "config")
 }
 
+var AppConfig *Config
+
+func init() {
+	AppConfig = InitAppConfig()
+}
+
 func InitAppConfig() *Config {
 	configPath := parseConfigFilePath()
 	viper.SetConfigName("config")

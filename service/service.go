@@ -7,9 +7,9 @@ import (
 type IService interface {
 	Login(u *LoginParams) (*LoginOutput, error)
 	Logout(u *LogoutParams) error
-	RefreshToken(u *RefreshTokenParams) error
+	RefreshToken(u *RefreshTokenParams) (*LoginOutput, error)
 }
 
 type Service struct {
-	Cacher *repo.RedisRepo
+	Redis *repo.RedisRepo
 }
