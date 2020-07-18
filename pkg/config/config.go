@@ -43,8 +43,6 @@ type Config struct {
 	GoogleMaxInFlight        int    `mapstructure:"google_max_in_flight"`
 }
 
-var AppConfig Config
-
 func parseConfigFilePath() string {
 	workPath, err := os.Getwd()
 	if err != nil {
@@ -54,7 +52,7 @@ func parseConfigFilePath() string {
 	return filepath.Join(workPath, "config")
 }
 
-func InitAppConfig() {
+func InitAppConfig() *Config {
 	configPath := parseConfigFilePath()
 	viper.SetConfigName("config")
 	viper.SetConfigType("env")
@@ -64,7 +62,10 @@ func InitAppConfig() {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 
-	if err := viper.Unmarshal(&AppConfig); err != nil {
+	config := new(Config)
+	if err := viper.Unmarshal(config); err != nil {
 		panic(fmt.Errorf("failed to parse config file: %w", err))
 	}
+
+	return config
 }

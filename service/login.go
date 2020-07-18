@@ -1,10 +1,9 @@
-package handler
+package service
 
 import (
 	"github.com/Ifkarsyah/authfer/model"
 	"github.com/Ifkarsyah/authfer/pkg/errs"
 	"github.com/Ifkarsyah/authfer/pkg/token"
-	"github.com/Ifkarsyah/authfer/repo"
 )
 
 type LoginParams struct {
@@ -16,18 +15,17 @@ type LoginOutput struct {
 	Ts *model.TokenDetails
 }
 
-func LoginHandler(u *LoginParams) (*LoginOutput, error) {
+func (h *Service) Login(u *LoginParams) (*LoginOutput, error) {
 	userid, err := UserRepoSearchWithUsernamePassword(u.Username, u.Password)
 	if err != nil {
 		return nil, errs.ErrAuth
 	}
-
 	ts, err := token.CreateToken(userid)
 	if err != nil {
 		return nil, err
 	}
 
-	err = repo.RedisCreateAuth(userid, ts)
+	err = h.Cacher.RedisCreateAuth(userid, ts)
 	if err != nil {
 		return nil, err
 	}

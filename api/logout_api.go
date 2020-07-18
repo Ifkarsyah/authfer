@@ -5,12 +5,15 @@ import (
 	"github.com/Ifkarsyah/authfer/pkg/responder"
 	token2 "github.com/Ifkarsyah/authfer/pkg/token"
 	"github.com/Ifkarsyah/authfer/repo"
+	"github.com/Ifkarsyah/authfer/service"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"strconv"
 )
 
-func Logout() http.Handler {
+type logoutHandlerFunc func(*service.LogoutParams) error
+
+func Logout(logoutHandler logoutHandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		au, err := ExtractTokenMetadata(r)
@@ -19,11 +22,12 @@ func Logout() http.Handler {
 			return
 		}
 
-		deleted, delErr := repo.RedisDeleteAuth(au.AccessUuid)
-		if delErr != nil || deleted == 0 { //if any goes wrong
+		err = logoutHandler(&service.LogoutParams{AccessDetails: au})
+		if err != nil {
 			responder.ResponseError(w, err)
 			return
 		}
+
 		w.WriteHeader(http.StatusOK)
 	})
 }

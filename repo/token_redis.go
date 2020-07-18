@@ -7,21 +7,25 @@ import (
 	"time"
 )
 
-var redisClient *redis.Client
-
-func init() {
-	redisClient = NewRedisConnection()
+type RedisRepo struct {
+	client *redis.Client
 }
 
-func NewRedisConnection() *redis.Client {
+type IRedisRepo interface {
+	RedisCreateAuth(userid uint64, td *model.TokenDetails) error
+	RedisGetAuth(authD *AccessDetails) (uint64, error)
+	RedisDeleteAuth(givenUuid string) (int64, error)
+}
+
+func NewRedisConnection(host string, port string) *RedisRepo {
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: host + ":" + port,
 	})
 	_, err := redisClient.Ping().Result()
 	if err != nil {
 		panic(err)
 	}
-	return redisClient
+	return &RedisRepo{client: redisClient}
 }
 
 type AccessDetails struct {
@@ -29,24 +33,24 @@ type AccessDetails struct {
 	UserId     uint64
 }
 
-func RedisCreateAuth(userid uint64, td *model.TokenDetails) error {
+func (r *RedisRepo) RedisCreateAuth(userid uint64, td *model.TokenDetails) error {
 	at := time.Unix(td.AtExpires, 0) //converting Unix to UTC(to Time object)
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
 
-	errAccess := redisClient.Set(td.AccessUuid, strconv.Itoa(int(userid)), at.Sub(now)).Err()
+	errAccess := r.client.Set(td.AccessUuid, strconv.Itoa(int(userid)), at.Sub(now)).Err()
 	if errAccess != nil {
 		return errAccess
 	}
-	errRefresh := redisClient.Set(td.RefreshUuid, strconv.Itoa(int(userid)), rt.Sub(now)).Err()
+	errRefresh := r.client.Set(td.RefreshUuid, strconv.Itoa(int(userid)), rt.Sub(now)).Err()
 	if errRefresh != nil {
 		return errRefresh
 	}
 	return nil
 }
 
-func RedisGetAuth(authD *AccessDetails) (uint64, error) {
-	userid, err := redisClient.Get(authD.AccessUuid).Result()
+func (r *RedisRepo) RedisGetAuth(authD *AccessDetails) (uint64, error) {
+	userid, err := r.client.Get(authD.AccessUuid).Result()
 	if err != nil {
 		return 0, err
 	}
@@ -54,8 +58,8 @@ func RedisGetAuth(authD *AccessDetails) (uint64, error) {
 	return userID, nil
 }
 
-func RedisDeleteAuth(givenUuid string) (int64, error) {
-	deleted, err := redisClient.Del(givenUuid).Result()
+func (r *RedisRepo) RedisDeleteAuth(givenUuid string) (int64, error) {
+	deleted, err := r.client.Del(givenUuid).Result()
 	if err != nil {
 		return 0, err
 	}
