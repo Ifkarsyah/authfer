@@ -8,9 +8,7 @@ import (
 	"net/http"
 )
 
-type loginHandlerFunc func(*service.LoginParams) (*service.LoginOutput, error)
-
-func LoginAPI(loginHandler loginHandlerFunc) http.Handler {
+func LoginAPI(loginHandler service.LoginHandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		params := new(service.LoginParams)

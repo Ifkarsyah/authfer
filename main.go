@@ -30,11 +30,13 @@ func NewService(dep *Dependency) service.Service {
 
 type Dependency struct {
 	cache *repo.RedisRepo
+	db    *repo.DBRepo
 }
 
 func main() {
 	svc := NewService(&Dependency{
 		cache: repo.NewRedisConnection(config.AppConfig.RedisHost, config.AppConfig.RedisPort),
+		db:    repo.NewDBConnection(),
 	})
 
 	server := &http.Server{

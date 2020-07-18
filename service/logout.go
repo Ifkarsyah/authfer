@@ -1,11 +1,11 @@
 package service
 
 import (
-	"github.com/Ifkarsyah/authfer/repo"
+	"github.com/Ifkarsyah/authfer/model"
 )
 
 type LogoutParams struct {
-	AccessDetails *repo.AccessDetails
+	AccessDetails *model.AccessDetails
 }
 
 func (h *Service) Logout(u *LogoutParams) error {

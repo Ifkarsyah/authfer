@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/Ifkarsyah/authfer/pkg/config"
 	"github.com/Ifkarsyah/authfer/pkg/errs"
 	"github.com/Ifkarsyah/authfer/pkg/token"
 	"github.com/dgrijalva/jwt-go"
@@ -13,24 +14,24 @@ type RefreshTokenParams struct {
 }
 
 func (h *Service) RefreshToken(u *RefreshTokenParams) (*LoginOutput, error) {
-	token2, err := jwt.Parse(u.PreviousToken, token.CheckConformHMAC("REFRESH_TOKEN"))
+	prevToken, err := jwt.Parse(u.PreviousToken, token.CheckConformHMAC(config.AppConfig.Secret))
 	if err != nil {
 		return nil, err
 	}
 
-	//is token2 valid?
-	if _, ok := token2.Claims.(jwt.Claims); !ok && !token2.Valid {
+	//is prevToken valid?
+	if _, ok := prevToken.Claims.(jwt.Claims); !ok && !prevToken.Valid {
 		//w.WriteHeader(http.StatusUnauthorized)
-		//json.NewEncoder(w).Encode("Refresh token2 expired")
+		//json.NewEncoder(w).Encode("Refresh prevToken expired")
 		return nil, errs.ErrAuth
 	}
 
-	claims, ok := token2.Claims.(jwt.MapClaims)
-	if !ok || !token2.Valid {
+	claims, ok := prevToken.Claims.(jwt.MapClaims)
+	if !ok || !prevToken.Valid {
 		return nil, errs.ErrAuth
 	}
 
-	//Since token2 is valid, get the uuid:
+	//Since prevToken is valid, get the uuid:
 	refreshUuid, ok := claims["refresh_uuid"].(string) //convert the interface to string
 	if !ok {
 		return nil, errs.ErrAuth

@@ -6,11 +6,6 @@ import (
 	"time"
 )
 
-type AccessDetails struct {
-	AccessUuid string
-	UserId     uint64
-}
-
 func (r *RedisRepo) RedisCreateAuth(userid uint64, td *model.TokenDetails) error {
 	at := time.Unix(td.AtExpires, 0) //converting Unix to UTC(to Time object)
 	rt := time.Unix(td.RtExpires, 0)
@@ -27,7 +22,7 @@ func (r *RedisRepo) RedisCreateAuth(userid uint64, td *model.TokenDetails) error
 	return nil
 }
 
-func (r *RedisRepo) RedisGetAuth(authD *AccessDetails) (uint64, error) {
+func (r *RedisRepo) RedisGetAuth(authD *model.AccessDetails) (uint64, error) {
 	userid, err := r.client.Get(authD.AccessUuid).Result()
 	if err != nil {
 		return 0, err

@@ -12,4 +12,5 @@ type IService interface {
 
 type Service struct {
 	Redis *repo.RedisRepo
+	DB    *repo.DBRepo
 }

@@ -11,7 +11,7 @@ type RedisRepo struct {
 
 type IRedisRepo interface {
 	RedisCreateAuth(userid uint64, td *model.TokenDetails) error
-	RedisGetAuth(authD *AccessDetails) (uint64, error)
+	RedisGetAuth(authD *model.AccessDetails) (uint64, error)
 	RedisDeleteAuth(givenUuid string) (int64, error)
 }
 

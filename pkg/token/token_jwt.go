@@ -3,6 +3,7 @@ package token
 import (
 	"fmt"
 	"github.com/Ifkarsyah/authfer/model"
+	"github.com/Ifkarsyah/authfer/pkg/config"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/twinj/uuid"
 	"time"
@@ -35,7 +36,7 @@ func createRefreshToken(userid uint64, td *model.TokenDetails) (string, error) {
 	rtClaims["user_id"] = userid
 	rtClaims["exp"] = td.RtExpires
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
-	return rt.SignedString([]byte("REFRESH_SECRET"))
+	return rt.SignedString([]byte(config.AppConfig.Secret))
 }
 
 func createAccessToken(userid uint64, td *model.TokenDetails) (string, error) {
@@ -45,7 +46,7 @@ func createAccessToken(userid uint64, td *model.TokenDetails) (string, error) {
 	atClaims["user_id"] = userid
 	atClaims["exp"] = td.AtExpires
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-	return at.SignedString([]byte("ACCESS_SECRET"))
+	return at.SignedString([]byte(config.AppConfig.Secret))
 }
 
 func CheckConformHMAC(secret string) func(token *jwt.Token) (interface{}, error) {

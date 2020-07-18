@@ -15,8 +15,10 @@ type LoginOutput struct {
 	Ts *model.TokenDetails
 }
 
+type LoginHandlerFunc func(*LoginParams) (*LoginOutput, error)
+
 func (h *Service) Login(u *LoginParams) (*LoginOutput, error) {
-	userid, err := UserRepoSearchWithUsernamePassword(u.Username, u.Password)
+	userid, err := h.DB.GetUseridByUsernamePassword(u.Username, u.Password)
 	if err != nil {
 		return nil, errs.ErrAuth
 	}
@@ -31,11 +33,4 @@ func (h *Service) Login(u *LoginParams) (*LoginOutput, error) {
 	}
 
 	return &LoginOutput{Ts: ts}, nil
-}
-
-func UserRepoSearchWithUsernamePassword(username string, password string) (userid uint64, err error) {
-	if model.AuthSample.Username != username || model.AuthSample.Password != password {
-		return 0, err
-	}
-	return 1, nil
 }

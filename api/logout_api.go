@@ -2,9 +2,9 @@ package api
 
 import (
 	"fmt"
+	"github.com/Ifkarsyah/authfer/model"
 	"github.com/Ifkarsyah/authfer/pkg/responder"
-	token2 "github.com/Ifkarsyah/authfer/pkg/token"
-	"github.com/Ifkarsyah/authfer/repo"
+	"github.com/Ifkarsyah/authfer/pkg/token"
 	"github.com/Ifkarsyah/authfer/service"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
@@ -16,7 +16,7 @@ type logoutHandlerFunc func(*service.LogoutParams) error
 func Logout(logoutHandler logoutHandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		au, err := ExtractTokenMetadata(r)
+		au, err := extractTokenMetadata(r)
 		if err != nil {
 			responder.ResponseError(w, err)
 			return
@@ -32,13 +32,13 @@ func Logout(logoutHandler logoutHandlerFunc) http.Handler {
 	})
 }
 
-func ExtractTokenMetadata(r *http.Request) (*repo.AccessDetails, error) {
-	token, err := token2.VerifyToken(r)
+func extractTokenMetadata(r *http.Request) (*model.AccessDetails, error) {
+	prevToken, err := token.VerifyToken(r)
 	if err != nil {
 		return nil, err
 	}
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
+	claims, ok := prevToken.Claims.(jwt.MapClaims)
+	if !ok || !prevToken.Valid {
 		return nil, err
 	}
 
@@ -50,7 +50,7 @@ func ExtractTokenMetadata(r *http.Request) (*repo.AccessDetails, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &repo.AccessDetails{
+	return &model.AccessDetails{
 		AccessUuid: accessUuid,
 		UserId:     userId,
 	}, nil
