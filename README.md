@@ -10,8 +10,30 @@ go get -u github.com/Ifkarsyah/authfer
 
 ## Usage
 
-```go
-// TODO
+### Login
+```curl
+curl --location --request POST 'http://localhost:8080/login' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+	"username": "username",
+	"password": "password"
+}'
+```
+
+### Refresh Token
+```curl
+curl --location --request POST 'http://localhost:8080/refresh' \
+--header 'Authorization: Bearer {access token}' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+	"refresh_token": {refresh token}
+}'
+```
+
+### Logout
+```curl
+curl --location --request POST 'http://localhost:8080/logout' \
+--header 'Authorization: Bearer {access token}'
 ```
 
 ## Contributing

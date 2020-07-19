@@ -11,11 +11,16 @@ func (r *RedisRepo) RedisCreateAuth(userid uint64, td *model.TokenDetails) error
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
 
-	errAccess := r.client.Set(td.AccessUuid, strconv.Itoa(int(userid)), at.Sub(now)).Err()
+	atKey := td.AccessUuid
+	rtKey := td.RefreshUuid
+
+	val := strconv.Itoa(int(userid))
+
+	errAccess := r.client.Set(atKey, val, at.Sub(now)).Err()
 	if errAccess != nil {
 		return errAccess
 	}
-	errRefresh := r.client.Set(td.RefreshUuid, strconv.Itoa(int(userid)), rt.Sub(now)).Err()
+	errRefresh := r.client.Set(rtKey, val, rt.Sub(now)).Err()
 	if errRefresh != nil {
 		return errRefresh
 	}

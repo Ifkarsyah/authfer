@@ -41,6 +41,10 @@ type Config struct {
 	GoogleMaxRequeueConsumer int    `mapstructure:"google_max_requeue_consumer"`
 	GoogleConcurrent         int    `mapstructure:"google_concurrent"`
 	GoogleMaxInFlight        int    `mapstructure:"google_max_in_flight"`
+
+	// JWT
+	JwtAccessExpires  int `mapstructure:"jwt_at_expire"`
+	JwtRefreshExpires int `mapstructure:"jwt_rt_expire"`
 }
 
 func parseConfigFilePath() string {

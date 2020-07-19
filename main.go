@@ -16,7 +16,7 @@ func NewRouter(svc service.Service) *mux.Router {
 	root := mux.NewRouter()
 
 	root.Methods(http.MethodPost).Path("/login").Handler(api.LoginAPI(svc.Login))
-	root.Methods(http.MethodPost).Path("/refresh").Handler(api.RefreshAPI(svc.RefreshToken))
+	root.Methods(http.MethodPost).Path("/refresh").Handler(api.MiddlewareAuth(api.RefreshAPI(svc.RefreshToken)))
 	root.Methods(http.MethodPost).Path("/logout").Handler(api.MiddlewareAuth(api.Logout(svc.Logout)))
 
 	return root
@@ -25,6 +25,7 @@ func NewRouter(svc service.Service) *mux.Router {
 func NewService(dep *Dependency) service.Service {
 	return service.Service{
 		Redis: dep.cache,
+		DB:    dep.db,
 	}
 }
 
